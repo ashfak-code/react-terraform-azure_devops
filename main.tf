@@ -31,7 +31,7 @@ resource "azurerm_app_service_plan" "az_app_svplan" {
 }
 
 resource "azurerm_app_service" "az_app_sv" {
-  name                = "react-app-service"
+  name                = "react-app-service-ashfak"
   location            = azurerm_resource_group.tf_test.location
   resource_group_name = azurerm_resource_group.tf_test.name
   app_service_plan_id = azurerm_app_service_plan.az_app_svplan.id
