@@ -39,23 +39,26 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
   
-- stage: Deploy
+- stage: Provision
+  displayName: 'Terraforming on Azure...'
+  dependsOn: Build
   jobs:
-  - job: Deploy
+  - job: Provision
+    displayName: 'Provisioning Container Instance'
     pool:
       vmImage: 'ubuntu-latest'
-
+    variables: 
+    - group: TerraformSecrets
     steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'current'
-        downloadType: 'single'
-        artifactName: 'drop'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: AzureRmWebAppDeployment@4
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Free Trial (f32358fd-a007-4679-ba8b-94307357e9e2)'
-        appType: 'webApp'
-        WebAppName: 'ashfakcode'
-        packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    - script: |
+        set -e
+        terraform init -input=false
+        terraform apply -input=false -auto-approve
+      name: 'RunTerraform'
+      displayName: 'Run Terraform'
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+        
